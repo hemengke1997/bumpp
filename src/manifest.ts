@@ -12,11 +12,13 @@ export interface Manifest {
  * Determines whether the specified value is a package manifest.
  */
 export function isManifest(obj: any): obj is Manifest {
-  return obj
-    && typeof obj === 'object'
-    && isOptionalString(obj.name)
-    && isOptionalString(obj.version)
-    && isOptionalString(obj.description)
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    isOptionalString(obj.name) &&
+    isOptionalString(obj.version) &&
+    isOptionalString(obj.description)
+  )
 }
 
 /**
@@ -24,7 +26,5 @@ export function isManifest(obj: any): obj is Manifest {
  */
 function isOptionalString(value: any): value is string | undefined {
   const type = typeof value
-  return value === null
-    || type === 'undefined'
-    || type === 'string'
+  return value === null || type === 'undefined' || type === 'string'
 }

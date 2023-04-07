@@ -42,8 +42,9 @@ export async function versionBump(options: VersionBumpOptions): Promise<VersionB
  * Optionally also commits, tags, and pushes to git.
  */
 export async function versionBump(arg: VersionBumpOptions | string = {}): Promise<VersionBumpResults | undefined> {
-  if (typeof arg === 'string')
+  if (typeof arg === 'string') {
     arg = { release: arg }
+  }
 
   const operation = await Operation.start(arg)
 
@@ -54,13 +55,16 @@ export async function versionBump(arg: VersionBumpOptions | string = {}): Promis
   if (arg.confirm) {
     printSummary(operation)
 
-    if (!await prompts({
-      name: 'yes',
-      type: 'confirm',
-      message: 'Bump?',
-      initial: true,
-    }).then(r => r.yes))
+    if (
+      !(await prompts({
+        name: 'yes',
+        type: 'confirm',
+        message: 'Bump?',
+        initial: true,
+      }).then((r) => r.yes))
+    ) {
       process.exit(1)
+    }
   }
 
   // Run npm preversion script, if any
@@ -93,15 +97,19 @@ export async function versionBump(arg: VersionBumpOptions | string = {}): Promis
 
 function printSummary(operation: Operation) {
   console.log()
-  console.log(`   files ${operation.options.files.map(i => c.bold(i)).join('\n         ')}`)
-  if (operation.options.commit)
+  console.log(`   files ${operation.options.files.map((i) => c.bold(i)).join('\n         ')}`)
+  if (operation.options.commit) {
     console.log(`  commit ${c.bold(formatVersionString(operation.options.commit.message, operation.state.newVersion))}`)
-  if (operation.options.tag)
+  }
+  if (operation.options.tag) {
     console.log(`     tag ${c.bold(formatVersionString(operation.options.tag.name, operation.state.newVersion))}`)
-  if (operation.options.execute)
+  }
+  if (operation.options.execute) {
     console.log(` execute ${c.bold(operation.options.execute)}`)
-  if (operation.options.push)
+  }
+  if (operation.options.push) {
     console.log(`    push ${c.cyan(c.bold('yes'))}`)
+  }
   console.log()
   console.log(`    from ${c.bold(operation.state.oldVersion)}`)
   console.log(`      to ${c.green(c.bold(operation.state.newVersion))}`)
@@ -112,8 +120,9 @@ function printSummary(operation: Operation) {
  * Bumps the version number in one or more files, prompting users if necessary.
  */
 export async function versionBumpInfo(arg: VersionBumpOptions | string = {}): Promise<Operation> {
-  if (typeof arg === 'string')
+  if (typeof arg === 'string') {
     arg = { release: arg }
+  }
 
   const operation = await Operation.start(arg)
 

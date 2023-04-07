@@ -22,6 +22,9 @@ export async function getNewVersion(operation: Operation): Promise<Operation> {
         newVersion: new SemVer(release.version, true).version,
       })
 
+    case 'none':
+      return operation.update({ newVersion: oldVersion })
+
     default:
       return operation.update({
         release: release.type,
@@ -38,10 +41,10 @@ function getNextVersion(oldVersion: string, bump: BumpRelease): string {
   const newSemVer = oldSemVer.inc(bump.type as any, bump.preid)
 
   if (
-    isPrerelease(bump.type)
-    && newSemVer.prerelease.length === 2
-    && newSemVer.prerelease[0] === bump.preid
-    && String(newSemVer.prerelease[1]) === '0'
+    isPrerelease(bump.type) &&
+    newSemVer.prerelease.length === 2 &&
+    newSemVer.prerelease[0] === bump.preid &&
+    String(newSemVer.prerelease[1]) === '0'
   ) {
     // This is a special case when going from a non-prerelease version to a prerelease version.
     // SemVer sets the prerelease version to zero (e.g. "1.23.456" => "1.23.456-beta.0").
@@ -61,11 +64,13 @@ function getNextVersions(oldVersion: string, preid: string): Record<ReleaseType 
   const next: Record<string, string> = {}
 
   const parse = semver.parse(oldVersion)
-  if (typeof parse?.prerelease[0] === 'string')
+  if (typeof parse?.prerelease[0] === 'string') {
     preid = parse?.prerelease[0] || 'preid'
+  }
 
-  for (const type of releaseTypes)
+  for (const type of releaseTypes) {
     next[type] = semver.inc(oldVersion, type, preid)!
+  }
 
   next.next = parse?.prerelease?.length
     ? semver.inc(oldVersion, 'prerelease', preid)!
@@ -86,7 +91,7 @@ async function promptForNewVersion(operation: Operation): Promise<Operation> {
   const next = getNextVersions(oldVersion, release.preid)
 
   const PADDING = 13
-  const answers = await prompts([
+  const answers = (await prompts([
     {
       type: 'autocomplete',
       name: 'release',
@@ -105,27 +110,29 @@ async function promptForNewVersion(operation: Operation): Promise<Operation> {
       ],
     },
     {
-      type: prev => prev === 'custom' ? 'text' : null,
+      type: (prev) => (prev === 'custom' ? 'text' : null),
       name: 'custom',
       message: 'Enter the new version number:',
       initial: oldVersion,
       validate: (custom: string) => {
-        return isValidVersion(custom) ? true : 'That\'s not a valid version number'
+        return isValidVersion(custom) ? true : "That's not a valid version number"
       },
     },
-  ]) as {
+  ])) as {
     release: ReleaseType | 'next' | 'none' | 'custom'
     custom?: string
   }
 
-  const newVersion = answers.release === 'none'
-    ? oldVersion
-    : answers.release === 'custom'
+  const newVersion =
+    answers.release === 'none'
+      ? oldVersion
+      : answers.release === 'custom'
       ? cleanVersion(answers.custom!)!
       : next[answers.release]
 
-  if (!newVersion)
+  if (!newVersion) {
     process.exit(1)
+  }
 
   switch (answers.release) {
     case 'custom':

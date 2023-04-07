@@ -39,8 +39,9 @@ export async function readJsonFile(name: string, cwd: string): Promise<JsonFile>
 export async function writeJsonFile(file: JsonFile): Promise<void> {
   let json = JSON.stringify(file.data, undefined, file.indent)
 
-  if (file.newline)
+  if (file.newline) {
     json += file.newline
+  }
 
   return writeTextFile({ ...file, data: json })
 }
@@ -55,8 +56,7 @@ export function readTextFile(name: string, cwd: string): Promise<TextFile> {
     fs.readFile(filePath, 'utf8', (err, text) => {
       if (err) {
         reject(err)
-      }
-      else {
+      } else {
         resolve({
           path: filePath,
           data: text,
@@ -72,11 +72,11 @@ export function readTextFile(name: string, cwd: string): Promise<TextFile> {
 export function writeTextFile(file: TextFile): Promise<void> {
   return new Promise((resolve, reject) => {
     fs.writeFile(file.path, file.data, (err) => {
-      if (err)
+      if (err) {
         reject(err)
-
-      else
+      } else {
         resolve()
+      }
     })
   })
 }

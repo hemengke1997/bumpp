@@ -6,8 +6,9 @@ import { ProgressEvent } from './types/version-bump-progress'
  * Commits the modififed files to Git, if the `commit` option is enabled.
  */
 export async function gitCommit(operation: Operation): Promise<Operation> {
-  if (!operation.options.commit)
+  if (!operation.options.commit) {
     return operation
+  }
 
   const { all, noVerify, message } = operation.options.commit
   const { updatedFiles, newVersion } = operation.state
@@ -28,8 +29,9 @@ export async function gitCommit(operation: Operation): Promise<Operation> {
   args.push('--message', commitMessage)
 
   // Append the file names last, as variadic arguments
-  if (!all)
+  if (!all) {
     args = args.concat(updatedFiles)
+  }
 
   await ezSpawn.async('git', ['commit', ...args])
 
@@ -40,8 +42,9 @@ export async function gitCommit(operation: Operation): Promise<Operation> {
  * Tags the Git commit, if the `tag` option is enabled.
  */
 export async function gitTag(operation: Operation): Promise<Operation> {
-  if (!operation.options.tag)
+  if (!operation.options.tag) {
     return operation
+  }
 
   const { commit, tag } = operation.options
   const { newVersion } = operation.state
@@ -52,7 +55,8 @@ export async function gitTag(operation: Operation): Promise<Operation> {
     '--annotate',
 
     // Use the same commit message for the tag
-    '--message', formatVersionString(commit!.message, newVersion),
+    '--message',
+    formatVersionString(commit!.message, newVersion),
   ]
 
   // Create the Tag name
@@ -68,8 +72,9 @@ export async function gitTag(operation: Operation): Promise<Operation> {
  * Pushes the Git commit and tag, if the `push` option is enabled.
  */
 export async function gitPush(operation: Operation): Promise<Operation> {
-  if (!operation.options.push)
+  if (!operation.options.push) {
     return operation
+  }
 
   // Push the commit
   await ezSpawn.async('git', 'push')
@@ -88,9 +93,9 @@ export async function gitPush(operation: Operation): Promise<Operation> {
  * otherwise, the version number is appended to the string.
  */
 export function formatVersionString(template: string, newVersion: string): string {
-  if (template.includes('%s'))
+  if (template.includes('%s')) {
     return template.replace(/%s/g, newVersion)
-
-  else
+  } else {
     return template + newVersion
+  }
 }

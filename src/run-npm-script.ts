@@ -30,8 +30,9 @@ export async function runNpmScript(script: NpmScript, operation: Operation): Pro
 function hasScript(manifest: Manifest, script: NpmScript): boolean {
   const scripts = manifest.scripts as Record<NpmScript, string> | undefined
 
-  if (scripts && typeof scripts === 'object')
+  if (scripts && typeof scripts === 'object') {
     return Boolean(scripts[script])
+  }
 
   return false
 }

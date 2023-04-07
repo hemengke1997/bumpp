@@ -1,6 +1,6 @@
-import { ReleaseType } from 'semver'
+import type { ReleaseType } from 'semver'
 
-export { ReleaseType }
+export type { ReleaseType }
 
 /**
  * The different types of pre-releases.
@@ -24,4 +24,8 @@ export function isPrerelease(value: any): boolean {
  */
 export function isReleaseType(value: any): value is ReleaseType {
   return releaseTypes.includes(value)
+}
+
+export function isSkipRelease(value: any): value is 'none' {
+  return value === 'none'
 }

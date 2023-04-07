@@ -1,5 +1,5 @@
 {
-  "extends": "@antfu",
+  "extends": "@minko-fe",
   "rules": {
     "no-console": "off",
     "no-undef": "off",

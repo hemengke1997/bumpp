@@ -1,7 +1,7 @@
 import { valid as isValidVersion } from 'semver'
 import cac from 'cac'
 import c from 'picocolors'
-import { isReleaseType } from '../release-type'
+import { isReleaseType, isSkipRelease } from '../release-type'
 import type { VersionBumpOptions } from '../types/version-bump-options'
 import { version } from '../../package.json'
 import { bumpConfigDefaults, loadBumpConfig } from '../config'
@@ -67,23 +67,22 @@ export async function parseArgs(): Promise<ParsedArgs> {
     if (parsedArgs.options.files && parsedArgs.options.files.length > 0) {
       const firstArg = parsedArgs.options.files[0]
 
-      if (firstArg === 'prompt' || isReleaseType(firstArg) || isValidVersion(firstArg)) {
+      if (firstArg === 'prompt' || isSkipRelease(firstArg) || isReleaseType(firstArg) || isValidVersion(firstArg)) {
         parsedArgs.options.release = firstArg
         parsedArgs.options.files.shift()
       }
     }
 
     if (parsedArgs.options.recursive) {
-      if (parsedArgs.options.files?.length)
+      if (parsedArgs.options.files?.length) {
         console.log(c.yellow('The --recursive option is ignored when files are specified'))
-
-      else
+      } else {
         parsedArgs.options.files = ['package.json', 'package-lock.json', 'packages/**/package.json']
+      }
     }
 
     return parsedArgs
-  }
-  catch (error) {
+  } catch (error) {
     // There was an error parsing the command-line args
     return errorHandler(error as Error)
   }
