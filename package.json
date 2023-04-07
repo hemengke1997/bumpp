@@ -50,7 +50,7 @@
     "lint": "eslint . --fix",
     "build": "tsup src/index.ts src/cli/index.ts --format esm,cjs --dts --clean",
     "watch": "npm run build -- --watch src",
-    "start": "tsx src/cli/run.ts -no-p -no-t none package.json",
+    "start": "tsx src/cli/run.ts",
     "upgrade": "npm-check -u && npm audit fix",
     "bumpp": "tsx src/cli/run.ts",
     "prepublishOnly": "npm run clean && npm run build",
